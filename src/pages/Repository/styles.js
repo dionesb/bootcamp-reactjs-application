@@ -101,3 +101,7 @@ export const IssueList = styled.ul`
     }
   }
 `;
+
+export const FilterSelect = styled.select``;
+
+export const Pagination = styled.div``;

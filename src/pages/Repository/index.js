@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import api from '../../services/api';
 
 import Container from '../../components/Container';
-import { Loading, Owner, IssueList } from './styles';
+import { Loading, Owner, IssueList, FilterSelect, Pagination } from './styles';
 
 export default class Repository extends Component {
   static propTypes = {
@@ -19,6 +19,7 @@ export default class Repository extends Component {
     repository: {},
     issues: [],
     loading: true,
+    page: 1,
   };
 
   async componentDidMount() {
@@ -31,7 +32,7 @@ export default class Repository extends Component {
       api.get(`/repos/${repoName}`),
       api.get(`/repos/${repoName}/issues`, {
         params: {
-          state: 'open',
+          state: 'all',
           per_page: 5,
         },
       }),
@@ -44,8 +45,87 @@ export default class Repository extends Component {
     });
   }
 
+  handleFilter = async e => {
+    e.preventDefault();
+
+    const { repository } = this.state;
+
+    const filter = document.getElementById('filterSelect').value;
+    /* As promisses contidas no array seram todas executadas ao mesmo tempo. */
+    const [issues] = await Promise.all([
+      api.get(`/repos/${repository.full_name}/issues`, {
+        params: {
+          state: filter,
+          per_page: 5,
+        },
+      }),
+    ]);
+
+    this.setState({
+      issues: issues.data,
+    });
+  };
+
+  previousPage = async e => {
+    e.preventDefault();
+    console.log('Página anterior');
+
+    const { repository, page } = this.state;
+
+    if (page > 1) {
+      const newPage = page - 1;
+
+      const filter = document.getElementById('filterSelect').value;
+      /* As promisses contidas no array seram todas executadas ao mesmo tempo. */
+      const [issues] = await Promise.all([
+        api.get(`/repos/${repository.full_name}/issues`, {
+          params: {
+            state: filter,
+            per_page: 5,
+            page: newPage,
+          },
+        }),
+      ]);
+
+      this.setState({
+        issues: issues.data,
+        page: newPage,
+      });
+    }
+  };
+
+  nextPage = async e => {
+    e.preventDefault();
+    console.log('Página seguinte');
+
+    const { repository, page } = this.state;
+
+    if (page < 30) {
+      const newPage = page + 1;
+
+      const filter = document.getElementById('filterSelect').value;
+      /* As promisses contidas no array seram todas executadas ao mesmo tempo. */
+      const [issues] = await Promise.all([
+        api.get(`/repos/${repository.full_name}/issues`, {
+          params: {
+            state: filter,
+            per_page: 5,
+            page: newPage,
+          },
+        }),
+      ]);
+
+      if (issues.data.length > 0) {
+        this.setState({
+          issues: issues.data,
+          page: newPage,
+        });
+      }
+    }
+  };
+
   render() {
-    const { repository, issues, loading } = this.state;
+    const { repository, issues, loading, page } = this.state;
 
     if (loading) {
       return <Loading>Carregando</Loading>;
@@ -59,7 +139,16 @@ export default class Repository extends Component {
           <h1>{repository.name}</h1>
           <p>{repository.description}</p>
         </Owner>
-
+        <FilterSelect id="filterSelect" onChange={this.handleFilter}>
+          <option value="all">Todos</option>
+          <option value="open">Abertos</option>
+          <option value="closed">Fechados</option>
+        </FilterSelect>
+        {/* <select id="filterSelect" onChange={this.handleFilter}>
+          <option value="all">Todos</option>
+          <option value="open">Abertos</option>
+          <option value="closed">Fechados</option>
+        </select> */}
         <IssueList>
           {issues.map(issue => (
             <li key={String(issue.id)}>
@@ -76,6 +165,15 @@ export default class Repository extends Component {
             </li>
           ))}
         </IssueList>
+        <Pagination>
+          <button type="submit" onClick={this.previousPage}>
+            Anterior
+          </button>
+          <strong>{page}</strong>
+          <button type="submit" onClick={this.nextPage}>
+            Próxima
+          </button>
+        </Pagination>
       </Container>
     );
   }
