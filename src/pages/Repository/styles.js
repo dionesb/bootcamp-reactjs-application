@@ -102,6 +102,45 @@ export const IssueList = styled.ul`
   }
 `;
 
-export const FilterSelect = styled.select``;
+export const FilterSelect = styled.select`
+  background: #7159c1;
+  color: #fff;
+  padding: 10px 10px;
+  border: 0;
+  border-radius: 4px;
+  margin-top: 30px;
+`;
 
-export const Pagination = styled.div``;
+export const Pagination = styled.div`
+  margin-top: 30px;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+
+  strong {
+    display: flex;
+    font-size: 14px;
+    padding: 0 10px;
+  }
+`;
+
+export const PaginationButton = styled.button.attrs(props => ({
+  type: 'submit',
+  disabled: props.prevPage <= 1,
+}))`
+  background: #7159c1;
+  border: 0;
+  padding: 10px 15px;
+  border-radius: 4px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: #fff;
+
+  &[disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+`;

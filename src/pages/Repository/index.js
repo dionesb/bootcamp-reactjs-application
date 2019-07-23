@@ -4,7 +4,14 @@ import PropTypes from 'prop-types';
 import api from '../../services/api';
 
 import Container from '../../components/Container';
-import { Loading, Owner, IssueList, FilterSelect, Pagination } from './styles';
+import {
+  Loading,
+  Owner,
+  IssueList,
+  FilterSelect,
+  Pagination,
+  PaginationButton,
+} from './styles';
 
 export default class Repository extends Component {
   static propTypes = {
@@ -144,11 +151,6 @@ export default class Repository extends Component {
           <option value="open">Abertos</option>
           <option value="closed">Fechados</option>
         </FilterSelect>
-        {/* <select id="filterSelect" onChange={this.handleFilter}>
-          <option value="all">Todos</option>
-          <option value="open">Abertos</option>
-          <option value="closed">Fechados</option>
-        </select> */}
         <IssueList>
           {issues.map(issue => (
             <li key={String(issue.id)}>
@@ -166,13 +168,11 @@ export default class Repository extends Component {
           ))}
         </IssueList>
         <Pagination>
-          <button type="submit" onClick={this.previousPage}>
+          <PaginationButton prevPage={page} onClick={this.previousPage}>
             Anterior
-          </button>
+          </PaginationButton>
           <strong>{page}</strong>
-          <button type="submit" onClick={this.nextPage}>
-            Próxima
-          </button>
+          <PaginationButton onClick={this.nextPage}>Próxima</PaginationButton>
         </Pagination>
       </Container>
     );

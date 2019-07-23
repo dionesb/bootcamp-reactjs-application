@@ -65,7 +65,7 @@ export default class Main extends Component {
         notfind: false,
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       this.setState({
         loading: false,
         notfind: true,
